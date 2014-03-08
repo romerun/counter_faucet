@@ -35,7 +35,7 @@ let bitcointalk_form = Eliom_content.Html5.F.Unsafe.data (sprintf "
 
 <h2>Bitcointalk</h2>
 <p><a href='/beggars?asset=XCP'>check status</a></p>
-<p>Condition: require Bitcointalk account (registered before Jan 1st 2014)</p>
+<p>Condition: require Bitcointalk account (registered before Jan 1st 2014 or has activity at least 20)</p>
 
 <p>Enter BTC address, that you want to receive XCP (this address must never have XCP on it), on <a href='/images/ss1.png'>your Bitcointalk profile</a>, then <a href='/images/ss2.png'>sign message</a> \"%s\" with that address.</p>
 
@@ -61,9 +61,10 @@ let bitcointalk_username_pat = Str.regexp "Name: </b></td>[^<]+?<td>\\([^<]+\\)<
 let bitcointalk_address_pat = Str.regexp "Bitcoin address: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
 let bitcointalk_date_registered_pat = Str.regexp "Date Registered: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
 let year_pat = Str.regexp "\\(20[012][0123456789]\\)"
+let bitcointalk_activity_pat = Str.regexp "Activity: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
 
 let () =
-  Counter_faucet_app.register
+  ignore(Counter_faucet_app.register
     ~service:main_service
     (fun () () ->
       Lwt.return
@@ -72,9 +73,9 @@ let () =
            ~css:[["css";"counter_faucet.css"]]
            Html5.F.(body [
              bitcointalk_form
-    ])));
+    ]))));
 
-  Eliom_registration.Html_text.register_service
+  ignore(Eliom_registration.Html_text.register_service
     ~path:["api";"hungry_beggars"]
     ~content_type:"application/json"
     ~get_params:Eliom_parameter.(string "asset"**string "amount")
@@ -87,9 +88,9 @@ let () =
                            ) list in
        Lwt.return (Yojson.Safe.to_string (`List list))
        )
-    );
+    ));
 
-  Eliom_registration.Html5.register_service
+  ignore(Eliom_registration.Html5.register_service
     ~path:["beggars"]
     ~get_params:Eliom_parameter.(string "asset")
     (fun asset () ->
@@ -108,9 +109,9 @@ let () =
             (head (title (pcdata "All beggars status")) [])
             (body [ul list]))
        )
-    );
+    ));
 
-  Counter_faucet_app.register
+  ignore(Counter_faucet_app.register
     ~service:bitcointalk_service
     (fun () (user_id,signature) ->
      if String.length signature = 88 then
@@ -124,13 +125,14 @@ let () =
                try
                  ignore(Str.search_forward bitcointalk_date_registered_pat s 0);
                  let date_registered  = Str.matched_group 1 s in
-
                  ignore(Str.search_forward year_pat date_registered 0);
-
                  let date_registered = int_of_string (Str.matched_group 1 date_registered) in
 
-                 if date_registered >= 2014 then
-                   send_error "account appears to be created after 2013, you are out of luck"
+                 ignore(Str.search_forward bitcointalk_activity_pat s 0);
+                 let activity = int_of_string(Str.matched_group 1 s) in
+
+                 if date_registered >= 2014 && activity < 20 then
+                   send_error "account appears to be created after 2013, please wait until your bitcointalk activity is at least 20"
                  else
                    begin
                      ignore(Str.search_forward bitcointalk_username_pat s 0);
@@ -163,4 +165,4 @@ let () =
               )
      else
        send_error "definitely wrong signature"
-    )
+    ));

@@ -5,4 +5,9 @@
 setup.data
 setup.log
 _*
+*byte
 *native
+setup.ml
+myocamlbuild.ml
+local
+.depend
