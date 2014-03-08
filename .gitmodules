@@ -1,0 +1,3 @@
+[submodule "external/ocaml-counterparty"]
+	path = external/ocaml-counterparty
+	url = https://github.com/romerun/ocaml-counterparty
