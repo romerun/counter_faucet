@@ -7,6 +7,7 @@
 open Cohttp_lwt_unix
 open Lwt
 open Printf
+open Json_data
 
 module Counter_faucet_app =
   Eliom_registration.App (
@@ -78,13 +79,20 @@ let () =
   ignore(Eliom_registration.Html_text.register_service
     ~path:["api";"hungry_beggars"]
     ~content_type:"application/json"
-    ~get_params:Eliom_parameter.(string "asset"**string "amount")
-    (fun (asset,amount) () ->
+    ~get_params:Eliom_parameter.(string "asset"**string "amount"**bool "include_id")
+    (fun (asset,(amount,include_id)) () ->
      let amount = Int64.of_string amount in
      Db.get_beggars asset (Some amount) (fun list ->
        let list = List.map (function
-                               `Assoc [("id",_);("key",_);("value",_);("doc",`Assoc (("_id",_)::("_rev",_)::tl))] -> `Assoc tl
-                             | _ -> raise (Failure "json parsing error")
+                               `Assoc [("id",_);("key",_);("value",_);("doc",`Assoc assoc)] ->
+                               if include_id then
+                                 `Assoc assoc
+                               else
+                                 begin match assoc with
+                                       | (("_id",_)::("_rev",_)::tl) -> `Assoc tl
+                                       | _ -> assert false
+                                 end
+                             | _ -> assert false
                            ) list in
        Lwt.return (Yojson.Safe.to_string (`List list))
        )
@@ -94,14 +102,12 @@ let () =
     ~path:["beggars"]
     ~get_params:Eliom_parameter.(string "asset")
     (fun asset () ->
-     let display = function
-         [("address", `String address);("amount", amount);("asset", `String asset);("timestamp", `Int timestamp);("user_id", _);("username", `String username)] ->
-         li [pcdata (sprintf "%s: %s - %s - %s %s donated" (Util.unixtime_to_human (float_of_int timestamp)) username address (Util.string_of_satoshi (Util.to_int64 amount)) asset)]
-       | _ -> assert false
+     let display beggar =
+         li [pcdata (sprintf "%s: %s - %s - %s %s donated" (Util.unixtime_to_human beggar.Beggar.timestamp) beggar.Beggar.username beggar.Beggar.address (Util.string_of_satoshi beggar.Beggar.amount) beggar.Beggar.asset)]
      in
      Db.get_beggars asset None (fun list ->
        let list = List.map (function
-                               `Assoc [("id",_);("key",_);("value",_);("doc",`Assoc (("_id",_)::("_rev",_)::tl))] -> display (Util.sort_assoc tl)
+                               `Assoc [("id",_);("key",_);("value",_);("doc",`Assoc (("_id",_)::("_rev",_)::tl))] -> display (Beggar.to_beggar (Util.sort_assoc tl))
                              | _ -> assert false
                            ) list in
        Lwt.return

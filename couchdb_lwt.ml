@@ -4,7 +4,7 @@ open Yojson.Safe
 open Lwt
 open Cohttp_lwt_unix
 
-let debug = true
+let debug = false
 
 let default_couchdb_port = 5984
 
@@ -162,6 +162,16 @@ struct
   let get db doc_id callback =
     Request.with_db db `GET [doc_id] callback
 
+  let create_result callback json = function
+    | Network_fail cause | Internal_fail cause  -> callback (Error cause)
+    | Fail (error,reason) -> Printf.eprintf "%s\n" json; flush_all(); callback (Error (Printf.sprintf "error - %s / %s" error reason))
+    | Success (`Assoc (("ok", `Bool true)::("id", `String id)::("rev", `String rev)::_)) -> callback (Result_create (id,rev))
+    | Success json -> callback (Error (Printf.sprintf "parse json error %s" (Yojson.Safe.to_string json)))
+
+  let put_create db doc_id json callback = Request.with_db db `PUT ~body:(Some (Cohttp_lwt_body.of_string json)) [doc_id] (create_result callback json)
+
+  let update db doc_id json callback = Request.with_db db `PUT ~body:(Some (Cohttp_lwt_body.of_string json)) [doc_id] (create_result callback json)
+
 (*  let create db json callback =
     (*Printf.eprintf "create - %s\n" json; flush_all ();*)
 
@@ -185,26 +195,8 @@ struct
     | Fail (error,reason) -> callback (Error (Printf.sprintf "error - %s / %s" error reason))
     )
  *)
-  let put_create db doc_id json callback =
-    (*Printf.eprintf "put create %s\n" doc_id; flush_all ();*)
 
-    Request.with_db db `PUT ~body:(Some (Cohttp_lwt_body.of_string json)) [doc_id] ( function
-      | Network_fail cause | Internal_fail cause  -> callback (Error cause)
-      | Fail (error,reason) -> Printf.eprintf "%s\n" json; flush_all(); callback (Error (Printf.sprintf "error - %s / %s" error reason))
-      | Success (`Assoc (("ok", `Bool true)::("id", `String id)::("rev", `String rev)::_)) -> callback (Result_create (id,rev))
-      | Success json -> callback (Error (Printf.sprintf "parse json error %s" (Yojson.Safe.to_string json)))
-    )
-
-(*  let update db doc_id json callback =
-    (*Printf.eprintf "put update %s - %s\n" doc_id json; flush_all ();*)
-
-    Request.with_db db `PUT ~body:(Some (Cohttp_lwt_body.of_string json)) [doc_id] ( function
-        Success (`Assoc ("id", id)::(("rev", rev)::_)) -> callback (id,rev)
-      | Network_fail cause | Internal_fail cause  -> callback (Error cause)
-      | Fail (error,reason) -> callback (Error (Printf.sprintf "error - %s / %s" error reason))
-    )
-
-
+(*
   let rec insert_transactions db acc callback = (function
     tx::tl ->
       begin

@@ -6,7 +6,7 @@
 PROJECT_NAME := counter_faucet
 
 # Source files for the server
-SERVER_FILES := util.ml coin.ml couchdb_lwt.ml db.ml counter_faucet.eliom
+SERVER_FILES := util.ml coin.ml couchdb_lwt.ml db.ml json_data.ml counter_faucet.eliom
 # Source files for the client
 CLIENT_FILES := 
 
