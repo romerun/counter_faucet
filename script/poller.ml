@@ -2,7 +2,7 @@ open Printf
 open Counterparty
 open Json_data
 
-let url = "http://localhost:8080/api/hungry_beggars?asset=XCP&amount=100000000&include_id=true"
+let url = "http://xcp.bfolder.com/api/hungry_beggars?asset=XCP&amount=100000000&include_id=true"
 let db = Couchdb_lwt.mk_database (Couchdb_lwt.mk_server "172.17.42.1") "faucet"
 
 module Ctp_connection =

@@ -16,7 +16,7 @@ asset="XCP"
 #if you have many of them it will speed things up
 donation_addresses=['n29wjkYhPQprHRVZWxi345EMK6jDHz17Ly']
 
-faucet_url = "http://localhost:8080/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
+faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
 
 #some say it needs at least this satoshis, not sure, not much important really
 minimum_btc_on_address = 31720
@@ -37,7 +37,7 @@ auth = HTTPBasicAuth('rpcuser', 'graffitiseis')
 
 #stolen from counterpartyd
 def get_btc_balance(address):
-    r = requests.get("https://blockchain.info/q/addressbalance/" + address)
+    r = requests.get("https://blockchain.info/q/addressbalance/" + address + "?confirmations=1")
     # ^any other services that provide this?? (blockexplorer.com doesn't...)
     try:
         assert r.status_code == 200
