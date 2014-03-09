@@ -62,7 +62,7 @@ let bitcointalk_username_pat = Str.regexp "Name: </b></td>[^<]+?<td>\\([^<]+\\)<
 let bitcointalk_address_pat = Str.regexp "Bitcoin address: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
 let bitcointalk_date_registered_pat = Str.regexp "Date Registered: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
 let year_pat = Str.regexp "\\(20[012][0123456789]\\)"
-let bitcointalk_activity_pat = Str.regexp "Activity: </b></td>[^<]+?<td>\\([^<]+\\)</td>"
+let bitcointalk_activity_pat = Str.regexp "Activity:</b></td>[^<]+?<td>\\([^<]+\\)</td>"
 
 let () =
   ignore(Counter_faucet_app.register
@@ -133,7 +133,6 @@ let () =
                  let date_registered  = Str.matched_group 1 s in
                  ignore(Str.search_forward year_pat date_registered 0);
                  let date_registered = int_of_string (Str.matched_group 1 date_registered) in
-
                  ignore(Str.search_forward bitcointalk_activity_pat s 0);
                  let activity = int_of_string(Str.matched_group 1 s) in
 
@@ -145,24 +144,23 @@ let () =
                      let username = Str.matched_group 1 s in
                      ignore(Str.search_forward bitcointalk_address_pat s 0);
                      let btc_addr = Str.matched_group 1 s in
+
                      if String.length btc_addr = 34 && String.sub btc_addr 0 1 = "1" then
-                       Coin.BtcService.validateaddress btc_addr >>= (
-                       function
-                       | None -> send_error "BTC Address in your profile appears to be invalid"
-                       | Some _ -> 
-                          Coin.BtcService.verifymessage btc_addr signature message >>= (
-                           function
-                           | true ->
-                              Db.new_bitcointalk_beg user_id username btc_addr "XCP" (
-                                                       function 
-                                                       | Couchdb_lwt.Result_create _ -> 
-                                                          let str = Eliom_content.Html5.F.Unsafe.data (sprintf "We will be sending some XCP to you by soon-ish, you'll see it at <a target='_blank' href='http://blockscan.com/balance.aspx?q=%s'>http://blockscan.com/balance.aspx?q=%s</a> once it's sent" btc_addr btc_addr) in
-                                                          Lwt.return (html_template [str])
-                                                       | _ -> send_error "duplicate entry"
+                       Coin.BtcService.validateaddress btc_addr >>=
+                         function
+                         | None -> send_error "BTC Address in your profile appears to be invalid"
+                         | Some _ ->
+                            Coin.BtcService.verifymessage btc_addr signature message >>=
+                              function
+                              | true ->
+                                 Db.new_bitcointalk_beg user_id username btc_addr "XCP" (
+                                                          function 
+                                                          | Couchdb_lwt.Result_create _ -> 
+                                                             let str = Eliom_content.Html5.F.Unsafe.data (sprintf "We will be sending some XCP to you by soon-ish, you'll see it at <a target='_blank' href='http://blockscan.com/balance.aspx?q=%s'>http://blockscan.com/balance.aspx?q=%s</a> once it's sent" btc_addr btc_addr) in
+                                                             Lwt.return (html_template [str])
+                                                          | _ -> send_error "duplicate entry"
                                                      )
-                           | false -> send_error "wrong signature"
-                         )
-                     )
+                              | false -> send_error "wrong signature"
                      else
                        send_error (sprintf "BTC Address in your profile appears to be invalid -- %s" btc_addr)
                    end
