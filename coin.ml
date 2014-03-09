@@ -2,7 +2,7 @@ module Btc_connection =
 struct
   let default = Some
 		{
-		  Bitcoin.inet_addr = Unix.inet_addr_loopback;
+		  Bitcoin.inet_addr = Unix.inet_addr_of_string "172.17.42.1";
 		  host = "localhost";
 		  port = 8332;
 		  username = "bitcoinrpc";
