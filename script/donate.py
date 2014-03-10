@@ -4,10 +4,16 @@ from requests.auth import HTTPBasicAuth
 from random import shuffle
 import time
 
-##################### config #######################
+##################### user config #######################
 
-#give to beggars having the history of income less than or euqal to X satoshis
+# give to beggars having the history of income less than or euqal to X satoshis
+# 1e8 means that if an address has been given more than 1 XCP, we fill just filter it out of the list
 max_credit_satoshi=int(1e8)
+
+# in satoshis of course
+# 1e7 means that we are to give 0.01 XCP per person
+giveaway_per_beggar= int(1e7)
+#
 
 #in the future we might be able to giveaway other assets than XCP
 asset="XCP"
@@ -16,15 +22,6 @@ asset="XCP"
 #if you have many of them it will speed things up
 donation_addresses=['1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm','1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB','13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP']
 
-faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
-
-#some say it needs at least this satoshis, not sure, not much important really
-minimum_btc_on_address = 31720
-
-#in satoshis of course
-giveaway_per_beggar= int(1e7)
-#
-
 #### your counterparty config
 counterparty_url = "http://localhost:4000/api/"
 headers = {'content-type': 'application/json'}
@@ -32,6 +29,11 @@ auth = HTTPBasicAuth('rpcuser', 'graffitiseis')
 #
 
 ###################################################################################################
+
+faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
+
+#some say it needs at least this satoshis, not sure, not much important really
+minimum_btc_on_source_address = 31720
 
 #note.., might need to handle bignum properly, no clue to do in python, leave it for excercise
 
@@ -47,7 +49,7 @@ def get_btc_balance(address):
 
 def get_ready_address():
     for donation_address in donation_addresses:
-        if int(get_btc_balance (donation_address)) >= minimum_btc_on_address:
+        if int(get_btc_balance (donation_address)) >= minimum_btc_on_source_address:
             return donation_address
     
     print("no donation addresses available")
