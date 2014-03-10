@@ -117,7 +117,7 @@ let () =
     (fun () () ->
       Lwt.return
         (Eliom_tools.F.html
-           ~title:"counter_faucet"
+           ~title:"Counterparty faucet"
            ~css:[["css";"counter_faucet.css"]]
            Html5.F.(body [
              bitcointalk_form
