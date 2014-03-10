@@ -51,7 +51,9 @@ body { background-color: #E6E6E9; }
 </style>
 
 <img class='logo' src='/images/logo.png' width='90%%'/>
-<p><a href='https://bitcointalk.org/index.php?topic=395761.0;topicseen'>[XCP]</a> - <a href='https://www.counterparty.co/resources/'>Counterparty</a> is a protocol built on top of Bitcoin network. Since XCP is on BTC blockchain, XCP address = BTC address, you don't need to run a separate wallet to generate XCP address. In order to use Counterparty network, you will need to have some XCP tokens.</p>
+<p><a href='https://bitcointalk.org/index.php?topic=395761.0;topicseen'>[XCP]</a> - <a href='https://www.counterparty.co/resources/'>Counterparty</a> is a protocol built on top of Bitcoin network. Since XCP resides on BTC blockchain, XCP address = BTC address, you don't need to run a separate wallet to generate XCP address.</p>
+
+<p>Of course, in order to use Counterparty network, you will need to have some XCP tokens.</p>
 
 <p>You could either</p>
 <ul>
