@@ -86,9 +86,9 @@ body { background-color: #E6E6E9; }
 <p>You can either run <a href='https://github.com/romerun/counter_faucet/blob/master/script/donate.py'>this script</a> to give some XCP to the list of eligible people yourself.</p>
 <p>or if you trust me and are not so keen to run anything, you could send some XCP to the following addresses, and I help distributing them</p>
 <ul>
-<li>1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm <a href='https://blockchain.info/address/1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm'>blockscan</a></li>
-<li>1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB <a href='https://blockchain.info/address/1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB'>blockscan</a></li>
-<li>13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP <a href='https://blockchain.info/address/13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP'>blockscan</a></li>
+<li>1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm <a href='http://blockscan.com/address.aspx?q=1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm'>blockscan</a></li>
+<li>1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB <a href='http://blockscan.com/address.aspx?q=1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB'>blockscan</a></li>
+<li>13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP <a href='http://blockscan.com/address.aspx?q=13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP'>blockscan</a></li>
 </ul>
 </div>
 
