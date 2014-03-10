@@ -14,7 +14,7 @@ asset="XCP"
 
 #donation source addresses, be sure to unlock your wallet for a long time (since bitcoind the change needs to be confirmed before sending a new one)
 #if you have many of them it will speed things up
-donation_addresses=['n29wjkYhPQprHRVZWxi345EMK6jDHz17Ly']
+donation_addresses=['1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm','1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB','13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP']
 
 faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
 

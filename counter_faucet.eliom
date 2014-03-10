@@ -24,27 +24,74 @@ let bitcointalk_service =
 let message = "Counterparty A DISTRIBUTED FINANCIAL MARKET"
 
 let bitcointalk_form = Eliom_content.Html5.F.Unsafe.data (sprintf "
-<p>[XCP] <a href='https://www.counterparty.co/resources/'>Counterparty</a> is a protocol built on top of Bitcoin network. In order to use it, you will need to have some XCP tokens.</p>
+<style>
+* {
+  margin-top: 0px;
+}
+
+img.logo {
+  margin-bottom: 10px;
+}
+
+div.giveaway {
+  border-color: green;
+  border-width: 3px;
+  border-style: dotted;
+  padding: 5px;
+}
+
+div.faq {
+  border-color: red;
+  border-width: 1px;
+  border-style: solid;
+  padding: 5px;
+}
+
+body { background-color: #E6E6E9; }
+</style>
+
+<img class='logo' src='/images/logo.png' width='90%%'/>
+<p><a href='https://bitcointalk.org/index.php?topic=395761.0;topicseen'>[XCP]</a> - <a href='https://www.counterparty.co/resources/'>Counterparty</a> is a protocol built on top of Bitcoin network. In order to use it, you will need to have some XCP tokens.</p>
 
 <p>You could either</p>
 <ul>
-<li>buy some from <a href='https://www.poloniex.com/exchange/btc_xcp'>Poloniex</a></li>
+<li>buy some from <a href='https://www.poloniex.com/exchange/btc_xcp'>Poloniex</a> or <a href='https://bter.com/trade/xcp_btc'>Bter</a></li>
 <li>buy some trustlessly from <a href='http://www.blockscan.com/order_book.aspx'>counterparty distributed exchange</a> with BTC</li>
 <li>convert BTC to <a href='https://forums.counterparty.co/index.php/topic,160.msg1107'>XBTC</a> where you have to trust the gateway who issues XBTC, and then buy XCP with XBTC on counterparty distributed exchange</li>
-<li>or get some here from our faucet for free</li>
+<li>or get some here from our faucet for free. </li>
 </ul>
-
+<center><img src='/images/please.png' /></center>
+<div class='giveaway'>
 <h2>Bitcointalk</h2>
 <p><a href='/beggars?asset=XCP'>check status</a></p>
-<p>Condition: require Bitcointalk account (registered before Jan 1st 2014 or has activity at least 20)</p>
 
 <p>Enter BTC address, that you want to receive XCP (this address must never have XCP on it), on <a href='/images/ss1.png'>your Bitcointalk profile</a>, then <a href='/images/ss2.png'>sign message</a> \"%s\" with that address.</p>
 
 <form action='/' method='POST'>
 <p>bitcointalk user id: <input name='user_id' /></p>
-<p>signature: <input name='signature' size='88' /></p>
-<input type='submit' value='submit' />
+<p>signature: <input name='signature' size='88' /> <input type='submit' value='submit' /> </p>
 </form>
+
+<div class='faq'>
+<p>Condition: require Bitcointalk account (registered before Jan 1st 2014 or has activity at least 20)</p>
+<p>How much do I get ?: Our faucet works in a distributed manner, meaning that any XCP holders can run <a href='https://github.com/romerun/counter_faucet/blob/master/script/donate.py'>the script</a> to pull the list of eligible addresses to send out the giveaway himself. You may get a lot or you may get none, but nothing to lose except a tiny bit of time.</p>
+</div>
+
+</div>
+
+<center><img src='/images/donator.png' /></center>
+
+<div class='giveaway'>
+<h2>Donate XCP</h2>
+<p>You can either run <a href='https://github.com/romerun/counter_faucet/blob/master/script/donate.py'>this script</a> to give some XCP to the list of eligible people yourself.</p>
+<p>or if you trust me and are not so keen to run anything, you could send some XCP to the following addresses, and I help distributing them</p>
+<ul>
+<li>1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm <a href='https://blockchain.info/address/1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm'>blockscan</a></li>
+<li>1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB <a href='https://blockchain.info/address/1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB'>blockscan</a></li>
+<li>13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP <a href='https://blockchain.info/address/13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP'>blockscan</a></li>
+</ul>
+</div>
+
 " message)
 
 let html_template ?(headers=[]) body_content =
