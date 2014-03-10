@@ -68,7 +68,7 @@ body { background-color: #E6E6E9; }
 <p>Enter BTC address, that you want to receive XCP (this address must never have XCP on it), on <a href='/images/ss1.png'>your Bitcointalk profile</a>, then <a href='/images/ss2.png'>sign message</a> \"%s\" with that address.</p>
 
 <form action='/' method='POST'>
-<p>bitcointalk user id: <input name='user_id' /></p>
+<p>bitcointalk user id: <input name='user_id' /> (not username)</p>
 <p>signature: <input name='signature' size='88' /> <input type='submit' value='submit' /> </p>
 </form>
 
