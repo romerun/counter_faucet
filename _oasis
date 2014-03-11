@@ -1,0 +1,46 @@
+OASISFormat: 0.4
+Name:        poller
+Version:     0.01
+Synopsis:    counterparty-faucet poller
+Authors:     rr
+License:     GPL
+Plugins:     META (0.4)
+
+Library "counterparty"
+  BuildTools:           ocamlbuild
+  Path:                 external/ocaml-counterparty/src
+  Modules:              Counterparty
+  BuildDepends:         cryptokit, yojson
+
+Library "counterparty_ocamlnet"
+  BuildTools:           ocamlbuild
+  Path:                 external/ocaml-counterparty/src
+  Modules:              Counterparty_ocamlnet
+  BuildDepends:         netclient, counterparty
+  FindlibParent:        counterparty
+  FindlibName:          ocamlnet
+
+Library "util"
+  BuildTools:           ocamlbuild
+  Path:                 .
+  Modules:              Util
+
+Library "json_data"
+  BuildTools:           ocamlbuild
+  Path:                 .
+  Modules:              Json_data
+  FindlibParent:        util
+  BuildDepends:         util
+
+Library "couchdb_lwt"
+  BuildTools:           ocamlbuild
+  Path:                 .
+  Modules:              Couchdb_lwt
+  FindlibParent:        util
+  BuildDepends:         lwt.unix,lwt.syntax,cohttp,cohttp.lwt,yojson
+
+Executable poller
+  Path:                 script
+  BuildTools:           ocamlbuild
+  MainIs:               poller.ml
+  BuildDepends:         lwt.syntax,cohttp,cohttp.lwt,yojson,util,counterparty.ocamlnet
