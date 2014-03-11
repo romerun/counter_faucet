@@ -9,8 +9,8 @@ module Ctp_connection =
 struct
 	let default = Some
 		{
-		inet_addr = Unix.inet_addr_loopback;
-        host = "localhost";
+		inet_addr = Unix.inet_addr_of_string "172.17.42.1";
+	        host = "localhost";
 		port = 4000;
 		username = "rpcuser";
 		password = "graffitiseis";
