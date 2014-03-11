@@ -31,13 +31,17 @@ auth = HTTPBasicAuth('rpcuser', 'graffitiseis')
 
 ###################################################################################################
 
-faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
-
 #note.., might need to handle bignum properly, no clue to do in python, leave it for excercise
+
+def satoshi_of_float(f):
+    return 1e8 * f
+
+def float_of_satoshi(sato):
+    return sato / 1e8
 
 def try_to_send(destination,index):
     if index > len(donation_addresses)-1:
-        print("no donation addresses available, wait 5 minutes")
+        print("no donation addresses available, wait 5 minutes, make sure that you unlock the wallet and have enough BTC/XCP")
         time.sleep(5*60)
         try_to_send(destination,0)
     else:
@@ -91,9 +95,32 @@ def check_credit(address):
         return False
     else:
         return True
-    
+
+
+sys.stdout.write ("Get address whose credit is less than [%s]: " % (float_of_satoshi(max_credit_satoshi)))
+sys.stdout.flush()
+line = sys.stdin.readline()
+line = line.rstrip()
+if line != '':
+    max_credit_satoshi = satoshi_of_float(float(line))
+
+faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
+
 response = requests.get(faucet_url)
 beggars = response.json()
+
+print("")
+for beggar in beggars:
+    print ("%s %s = %s %s" % (beggar['username'],beggar['address'],float_of_satoshi(float(beggar['amount'])),beggar['asset']))
+print("")
+
+sys.stdout.write ("Give [%s] per person: " % (float_of_satoshi(giveaway_per_beggar)))
+sys.stdout.flush()
+line = sys.stdin.readline()
+line = line.rstrip()
+if line != '':
+    giveaway_per_beggar = satoshi_of_float(float(line))
+
 shuffle(beggars)
 
 for beggar in beggars:
