@@ -3,8 +3,13 @@ import requests
 from requests.auth import HTTPBasicAuth
 from random import shuffle
 import time
+import sys
 
 ##################### user config #######################
+
+#donation source addresses, be sure to unlock your wallet for a long time (since bitcoind the change needs to be confirmed before sending a new one)
+#if you have many of them it will speed things up
+donation_addresses=['1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm','1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB','13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP']
 
 # give to beggars having the history of income less than or euqal to X satoshis
 # 1e8 means that if an address has been given more than 1 XCP, we fill just filter it out of the list
@@ -12,15 +17,11 @@ max_credit_satoshi=int(1e8)
 
 # in satoshis of course
 # 1e7 means that we are to give 0.01 XCP per person
-giveaway_per_beggar= int(1e7)
+giveaway_per_beggar= int(2e7)
 #
 
 #in the future we might be able to giveaway other assets than XCP
 asset="XCP"
-
-#donation source addresses, be sure to unlock your wallet for a long time (since bitcoind the change needs to be confirmed before sending a new one)
-#if you have many of them it will speed things up
-donation_addresses=['1HGT1utMx3JbkDyrCiH3rf84FzK1BVEhSm','1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB','13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP']
 
 #### your counterparty config
 counterparty_url = "http://localhost:4000/api/"
@@ -32,29 +33,44 @@ auth = HTTPBasicAuth('rpcuser', 'graffitiseis')
 
 faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&include_id=false" % (asset,max_credit_satoshi)
 
-#some say it needs at least this satoshis, not sure, not much important really
-minimum_btc_on_source_address = 31720
-
 #note.., might need to handle bignum properly, no clue to do in python, leave it for excercise
 
-#stolen from counterpartyd
-def get_btc_balance(address):
-    r = requests.get("https://blockchain.info/q/addressbalance/" + address + "?confirmations=1")
-    # ^any other services that provide this?? (blockexplorer.com doesn't...)
-    try:
-        assert r.status_code == 200
-        return int(r.text) / float(config.UNIT)
-    except:
-        return -1
+def try_to_send(destination,index):
+    if index > len(donation_addresses)-1:
+        print("no donation addresses available, wait 5 minutes")
+        time.sleep(5*60)
+        try_to_send(destination,0)
+    else:
+        payload = {
+            "method": "create_send",
+            "params": [donation_addresses[index], destination, "XCP", giveaway_per_beggar],
+            "jsonrpc": "2.0",
+            "id": 0,
+        }
 
-def get_ready_address():
-    for donation_address in donation_addresses:
-        if int(get_btc_balance (donation_address)) >= minimum_btc_on_source_address:
-            return donation_address
-    
-    print("no donation addresses available")
-    time.sleep(5*60)
-    get_ready_address()
+        response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
+        response = response.json()
+        if 'result' in response:
+            tx_hex = response['result']
+
+            payload = {
+                "method": "transmit",
+                "params": [tx_hex],
+                "jsonrpc": "2.0",
+                "id": 0,
+            }
+
+            response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
+            response = response.json()
+            if 'result' in response:
+                tx_id = response['result']
+                print("sent from %s to %s: response = %s\n" % (donation_addresses[index], destination, tx_id))
+                time.sleep(1)
+            else:
+                try_to_send(destination,index+1)
+        else:
+            #print("address(%s) not available - %s" % (donation_addresses[index],response))
+            try_to_send(destination,index+1)
 
 def check_credit(address):
     payload = {
@@ -81,34 +97,9 @@ beggars = response.json()
 shuffle(beggars)
 
 for beggar in beggars:
-    source_address = get_ready_address()
-
     print ("%s" % beggar['username'])
     if check_credit (beggar['address']):
-        payload = {
-            "method": "create_send",
-            "params": [source_address, beggar['address'], "XCP", giveaway_per_beggar],
-            "jsonrpc": "2.0",
-            "id": 0,
-        }
-
-        response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
-        response = response.json()
-        tx_hex = response['result']
-
-        payload = {
-            "method": "transmit",
-            "params": [tx_hex],
-            "jsonrpc": "2.0",
-            "id": 0,
-        }
-
-        response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
-        response = response.json()
-        tx_id = response['result']
-
-        print("sent from %s to %s: response = %s\n" % (source_address, beggar['username'], tx_id))
-        time.sleep(1)
+        try_to_send(beggar['address'],0)
     else:
         print("skip this rich beggar %s\n" % (beggar['username']))
 
