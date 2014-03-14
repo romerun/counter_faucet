@@ -154,7 +154,13 @@ let () =
     ~get_params:Eliom_parameter.(string "asset")
     (fun asset () ->
      let display beggar =
-         li [pcdata (sprintf "%s: %s - %s - %s %s donated" (Util.unixtime_to_human beggar.Beggar.timestamp) beggar.Beggar.username beggar.Beggar.address (Util.string_of_satoshi beggar.Beggar.amount) beggar.Beggar.asset)]
+         li [Eliom_content.Html5.F.Unsafe.data 
+               (sprintf "%s: %s - %s - %s %s donated" 
+                        (Util.unixtime_to_human beggar.Beggar.timestamp)
+                        beggar.Beggar.username beggar.Beggar.address
+                        (Util.string_of_satoshi beggar.Beggar.amount)
+                        beggar.Beggar.asset
+            )]
      in
      Db.get_beggars asset None (fun list ->
        let list = List.map (function
