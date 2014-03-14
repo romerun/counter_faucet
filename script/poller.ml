@@ -23,20 +23,22 @@ let process_beggar id assoc beggar =
   let credits = CTP.get_credits ~filters:[("asset",Filter.EQ,"XCP");("address",Filter.EQ,beggar.Beggar.address)] () in
   let total_credit = List.fold_left (fun acc x -> Int64.add acc x.Credit.amount) 0L credits in
   if Int64.compare beggar.Beggar.amount total_credit <> 0 then
-    printf "updating credit of %s to %s\n" beggar.Beggar.username (Int64.to_string total_credit); flush_all ();
+    begin
+      printf "updating credit of %s to %s\n" beggar.Beggar.username (Int64.to_string total_credit); flush_all ();
 
-    let json = `Assoc (
-                  List.map (fun (k,v) -> 
-                            if k = "amount" then
-                              (k,`Intlit (Int64.to_string total_credit))
-                            else
-                              (k,v)
-                           ) assoc
-                )
-    in
-    let json_string = Yojson.Safe.to_string json in
-    let thr = Couchdb_lwt.Basic.update db id json_string (function Couchdb_lwt.Result_create _ -> Lwt.return () | _ -> eprintf "update fail - %s" json_string; flush_all(); Lwt.return ()) in
-    Lwt_main.run thr
+      let json = `Assoc (
+                    List.map (fun (k,v) -> 
+                              if k = "amount" then
+                                (k,`Intlit (Int64.to_string total_credit))
+                              else
+                                (k,v)
+                             ) assoc
+                  )
+      in
+      let json_string = Yojson.Safe.to_string json in
+      let thr = Couchdb_lwt.Basic.update db id json_string (function Couchdb_lwt.Result_create _ -> Lwt.return () | _ -> eprintf "update fail - %s" json_string; flush_all(); Lwt.return ()) in
+      Lwt_main.run thr
+    end
 
 let rec poll () =
   let call = new Http_client.get url in
