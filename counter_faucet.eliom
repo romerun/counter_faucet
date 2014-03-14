@@ -21,6 +21,8 @@ let main_service =
 let bitcointalk_service = 
   Eliom_service.App.post_service ~fallback:main_service ~post_params:Eliom_parameter.(int "user_id"**string "signature") ()
 
+let bitcointalk_min_activity = 100
+
 let message = "Counterparty A DISTRIBUTED FINANCIAL MARKET"
 
 let bitcointalk_form = Eliom_content.Html5.F.Unsafe.data (sprintf "
@@ -75,7 +77,7 @@ body { background-color: #E6E6E9; }
 </form>
 
 <div class='faq'>
-<p>Condition: require Bitcointalk account (registered before Jan 1st 2014 or has activity at least 20)</p>
+<p>Condition: require Bitcointalk account (registered before Jan 1st 2014 or has activity at least %d)</p>
 <p>How much do I get ?: Our faucet works in a distributed manner, meaning that any XCP holders can run <a href='https://github.com/romerun/counter_faucet/blob/master/script/donate.py'>the script</a> to pull the list of eligible addresses to send out the giveaway himself. You may get a lot or you may get none, but nothing to lose except a tiny bit of time.</p>
 </div>
 
@@ -94,7 +96,7 @@ body { background-color: #E6E6E9; }
 </ul>
 </div>
 
-" message)
+" message bitcointalk_min_activity)
 
 let html_template ?(headers=[]) body_content =
   (html
@@ -185,8 +187,8 @@ let () =
                  ignore(Str.search_forward bitcointalk_activity_pat s 0);
                  let activity = int_of_string(Str.matched_group 1 s) in
 
-                 if date_registered >= 2014 && activity < 20 then
-                   send_error "account appears to be created after 2013, please wait until your bitcointalk activity is at least 20"
+                 if date_registered >= 2014 && activity < bitcointalk_min_activity then
+                   send_error (Printf.sprintf "account appears to be created after 2013, please wait until your bitcointalk activity is at least %d" bitcointalk_min_activity)
                  else
                    begin
                      ignore(Str.search_forward bitcointalk_username_pat s 0);
