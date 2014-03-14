@@ -109,6 +109,9 @@ faucet_url = "http://xcp.bfolder.com/api/hungry_beggars?asset=%s&amount=%d&inclu
 response = requests.get(faucet_url)
 beggars = response.json()
 
+beggars = [i for i in beggars if ((not ('sockpuppet' in i)) or (not i['sockpuppet']))]
+
+print (beggars)
 print("")
 for beggar in beggars:
     print ("%s %s = %s %s" % (beggar['username'],beggar['address'],float_of_satoshi(float(beggar['amount'])),beggar['asset']))
@@ -126,10 +129,7 @@ shuffle(beggars)
 for beggar in beggars:
     print ("%s" % beggar['username'])
     if check_credit (beggar['address']):
-        if (!beggar['sockpuppet']):
-            try_to_send(beggar['address'],0)
-        else:
-            print("skip sockpuppet %s\n" % (beggar['username']))
+        try_to_send(beggar['address'],0)
     else:
         print("skip this rich beggar %s\n" % (beggar['username']))
 
