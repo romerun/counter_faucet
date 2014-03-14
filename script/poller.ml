@@ -65,7 +65,7 @@ let rec poll () =
        flush_all();       
   );
 
-  Unix.sleep 2;
+  Unix.sleep 60;
   poll ()
 
 let () = poll ()
