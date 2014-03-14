@@ -156,7 +156,7 @@ let () =
      let display beggar =
        let sockpuppet = if beggar.Beggar.sockpuppet then "(likely sock puppet)" else "" in
        li [Eliom_content.Html5.F.Unsafe.data 
-             (sprintf "%s: %s -  <a target='_blank' href='http://blockscan.com/balance.aspx?q=%s'>%s</a> - %s %s donated %s" 
+             (sprintf "%s: %s -  <a target='_blank' href='http://blockscan.com/address.aspx?q=%s'>%s</a> - %s %s donated %s" 
                       (Util.unixtime_to_human beggar.Beggar.timestamp)
                       beggar.Beggar.username beggar.Beggar.address beggar.Beggar.address
                       (Util.string_of_satoshi beggar.Beggar.amount)
@@ -214,7 +214,7 @@ let () =
                                  Db.new_bitcointalk_beg user_id username btc_addr "XCP" (
                                                           function 
                                                           | Couchdb_lwt.Result_create _ -> 
-                                                             let str = Eliom_content.Html5.F.Unsafe.data (sprintf "We will be sending some XCP to you by soon-ish, you'll see it at <a target='_blank' href='http://blockscan.com/balance.aspx?q=%s'>http://blockscan.com/balance.aspx?q=%s</a> once it's sent" btc_addr btc_addr) in
+                                                             let str = Eliom_content.Html5.F.Unsafe.data (sprintf "We will be sending some XCP to you by soon-ish, you'll see it at <a target='_blank' href='http://blockscan.com/address.aspx?q=%s'>http://blockscan.com/address.aspx?q=%s</a> once it's sent" btc_addr btc_addr) in
                                                              Lwt.return (html_template [str])
                                                           | _ -> send_error "duplicate entry"
                                                      )
