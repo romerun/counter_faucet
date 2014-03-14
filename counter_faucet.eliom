@@ -154,13 +154,14 @@ let () =
     ~get_params:Eliom_parameter.(string "asset")
     (fun asset () ->
      let display beggar =
-         li [Eliom_content.Html5.F.Unsafe.data 
-               (sprintf "%s: %s - %s - %s %s donated" 
-                        (Util.unixtime_to_human beggar.Beggar.timestamp)
-                        beggar.Beggar.username beggar.Beggar.address
-                        (Util.string_of_satoshi beggar.Beggar.amount)
-                        beggar.Beggar.asset
-            )]
+       let sockpuppet = if beggar.Beggar.sockpuppet then "(likely sock puppet)" else "" in
+       li [Eliom_content.Html5.F.Unsafe.data 
+             (sprintf "%s: %s -  <a target='_blank' href='http://blockscan.com/balance.aspx?q=%s'>%s</a> - %s %s donated %s" 
+                      (Util.unixtime_to_human beggar.Beggar.timestamp)
+                      beggar.Beggar.username beggar.Beggar.address beggar.Beggar.address
+                      (Util.string_of_satoshi beggar.Beggar.amount)
+                      beggar.Beggar.asset sockpuppet
+          )]
      in
      Db.get_beggars asset None (fun list ->
        let list = List.map (function
