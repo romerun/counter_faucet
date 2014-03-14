@@ -126,7 +126,10 @@ shuffle(beggars)
 for beggar in beggars:
     print ("%s" % beggar['username'])
     if check_credit (beggar['address']):
-        try_to_send(beggar['address'],0)
+        if (!beggar['sockpuppet']):
+            try_to_send(beggar['address'],0)
+        else:
+            print("skip sockpuppet %s\n" % (beggar['username']))
     else:
         print("skip this rich beggar %s\n" % (beggar['username']))
 

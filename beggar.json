@@ -2,10 +2,10 @@
     "_id": "_design/beggar",
     "views": {
         "all": {
-            "map": "function (doc) { if (doc.address) { if (!doc.sockpuppet) {emit([doc.asset,doc.timestamp],null); }} }"
+            "map": "function (doc) { if (doc.address) { emit([doc.asset,doc.timestamp],null); } }"
          },
         "income": {
-            "map": "function (doc) { if (doc.address) { if (!doc.sockpuppet) {emit([doc.asset,doc.amount],null); }} }"
+            "map": "function (doc) { if (doc.address) { emit([doc.asset,doc.amount],null); } }"
          }
     }
 }
