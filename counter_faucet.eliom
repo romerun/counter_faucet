@@ -107,7 +107,7 @@ body { background-color: #E6E6E9; }
 <h2><a name='testxcp'>Testnet XCP</a></h2>
 <form action='/' method='POST'>
 <p>Get 3 Test XCP</p>
-<p>Enter valid bitcoin Testnet address: <input name='address' /> <input type='submit' value='submit' /> </p>
+<p>Enter valid bitcoin Testnet address: <input size='60' name='address' /> <input type='submit' value='submit' /> </p>
 </form>
 
 <div class='faq'>
