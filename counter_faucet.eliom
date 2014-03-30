@@ -8,6 +8,8 @@ open Cohttp_lwt_unix
 open Lwt
 open Printf
 open Json_data
+open Eliom_lib
+open Ocsigen_extensions
 
 module Counter_faucet_app =
   Eliom_registration.App (
@@ -20,6 +22,9 @@ let main_service =
 
 let bitcointalk_service = 
   Eliom_service.App.post_service ~fallback:main_service ~post_params:Eliom_parameter.(int "user_id"**string "signature") ()
+
+let testnet_faucet_service = 
+  Eliom_service.App.post_service ~fallback:main_service ~post_params:Eliom_parameter.(string "address") ()
 
 let bitcointalk_min_activity = 100
 
@@ -94,6 +99,20 @@ body { background-color: #E6E6E9; }
 <li>1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB <a href='http://blockscan.com/address.aspx?q=1NhGMimWGD37EDVVQiy8xfjXer72ywFTHB'>blockscan</a></li>
 <li>13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP <a href='http://blockscan.com/address.aspx?q=13LVzzK1wEGH51gyn3BPga2wtaYf7v3eWP'>blockscan</a></li>
 </ul>
+</div>
+
+<center><img src='/images/testnet.png' /></center>
+
+<div class='giveaway'>
+<h2><a name='Testnet'>Testnet XCP</a></h2>
+<form action='/' method='POST'>
+<p>Get 3 Test XCP</p>
+<p>Enter valid bitcoin Testnet address: <input name='address' /> <input type='submit' value='submit' /> </p>
+</form>
+
+<div class='faq'>
+<p>Condition: one request per 15 minutes</p>
+</div>
 </div>
 
 " message bitcointalk_min_activity)
@@ -227,4 +246,60 @@ let () =
               )
      else
        send_error "definitely wrong signature"
+    ));
+
+  let testnet_fund_addresses = [
+    "mxtxJQKcEgzg4GcSqmzWCvYS6tCVFnGrKk";
+    "mhtNNffT2PJgWqKLSvSyk7GPVHKDATQfov";
+    "mtj4gc2E2nTf6kAxfUigvPWhx4PyneyjHX";
+    "n3fgo3NajwVFLTk4koJW3fsJNWNHeKLMr5";
+    "mtKyQHKncNG74b2BquVipmwBGHbQCvnacw";
+    "n11gxcxLmkpPAeuddeMtCgfuixjYcGbHRc";
+    "n1zCcvS1Ni4GuWQsZn1X6ixiNmszsvpxLm"
+  ] in
+
+  let ips = Hashtbl.create 10 in
+  let counter = ref 0 in
+
+  let rec try_send destination = function
+    source::tl ->
+      begin
+        try
+          Coin.Testcoin.create_send ~source ~destination Counterparty.XCP 300000000L >>=
+            fun tx_hex -> Coin.Testcoin.transmit tx_hex >>= fun txid -> Lwt.return (html_template [pcdata "sent 3 Test XCP, it should arrive after 1 confirm"])
+        with
+        | _ -> try_send destination tl
+      end
+    | [] -> send_error "either our wallet is empty, your address is invalid, or what the hell happened on the backend, please come back later"
+  in
+
+  ignore(Counter_faucet_app.register
+    ~service:testnet_faucet_service
+    (fun () (address) ->
+     let rinfo = Eliom_request_info.get_ri () in
+     let frame = rinfo.ri_http_frame in
+     let client_ip =
+      try
+        Ocsigen_headers.find "HTTP_REMOTE_ADDR" frame
+      with
+        Not_found -> Eliom_request_info.get_remote_ip ()
+     in
+
+     let cont () =
+       try_send address testnet_fund_addresses
+     in
+     try
+       let last_given = Hashtbl.find ips client_ip in
+       if last_given +. (60.*.15.) <= Unix.time () then
+         send_error "you need to wait at least 15 times since last time you asked for it"
+       else
+         begin
+           Hashtbl.replace ips client_ip (Unix.time());
+           cont ()
+         end
+     with
+       Not_found -> 
+       incr counter;
+       if !counter mod 1000 = 0 then Hashtbl.clear ips;
+       Hashtbl.add ips client_ip (Unix.time()); cont ()
     ));

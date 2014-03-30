@@ -11,7 +11,7 @@ SERVER_FILES := util.ml coin.ml couchdb_lwt.ml db.ml json_data.ml counter_faucet
 CLIENT_FILES := 
 
 # OCamlfind packages for the server
-SERVER_PACKAGES := batteries yojson cohttp cohttp.lwt netclient bitcoin bitcoin.ocsigen
+SERVER_PACKAGES := batteries yojson cohttp cohttp.lwt netclient bitcoin bitcoin.ocsigen counterparty counterparty.ocsigen
 # OCamlfind packages for the client
 CLIENT_PACKAGES :=
 
