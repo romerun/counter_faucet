@@ -291,7 +291,7 @@ let () =
      try
        let last_given = Hashtbl.find ips client_ip in
        if last_given +. (60.*.15.) > Unix.time () then
-         send_error "you need to wait at least 15 times since last time you asked for it"
+         send_error "you need to wait at least 15 mins since last time you asked for it"
        else
          begin
            Hashtbl.replace ips client_ip (Unix.time());
