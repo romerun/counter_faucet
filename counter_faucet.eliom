@@ -264,7 +264,7 @@ let () =
   let rec try_send destination = function
     source::tl ->
       begin
-        try
+        try_lwt
           Coin.Testcoin.create_send ~source ~destination Counterparty.XCP 300000000L >>=
             fun tx_hex -> Coin.Testcoin.transmit tx_hex >>= fun txid -> Lwt.return (html_template [pcdata "sent 3 Test XCP, it should arrive after 1 confirm"])
         with
@@ -290,7 +290,7 @@ let () =
      in
      try
        let last_given = Hashtbl.find ips client_ip in
-       if last_given +. (60.*.15.) <= Unix.time () then
+       if last_given +. (60.*.15.) > Unix.time () then
          send_error "you need to wait at least 15 times since last time you asked for it"
        else
          begin
