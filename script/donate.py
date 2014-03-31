@@ -89,7 +89,7 @@ def check_credit(address):
 
     total = 0
     for credit in credits['result']:
-        total = total + int(credit['amount'])
+        total = total + int(credit['quantity'])
 
     if total > max_credit_satoshi:
         return False
