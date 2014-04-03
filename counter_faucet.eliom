@@ -248,15 +248,7 @@ let () =
        send_error "definitely wrong signature"
     ));
 
-  let testnet_fund_addresses = [
-    "mxtxJQKcEgzg4GcSqmzWCvYS6tCVFnGrKk";
-    "mhtNNffT2PJgWqKLSvSyk7GPVHKDATQfov";
-    "mtj4gc2E2nTf6kAxfUigvPWhx4PyneyjHX";
-    "n3fgo3NajwVFLTk4koJW3fsJNWNHeKLMr5";
-    "mtKyQHKncNG74b2BquVipmwBGHbQCvnacw";
-    "n11gxcxLmkpPAeuddeMtCgfuixjYcGbHRc";
-    "n1zCcvS1Ni4GuWQsZn1X6ixiNmszsvpxLm"
-  ] in
+  let testnet_fund_addresses = [ "n1MgZFi9ZFb8TZNAWaBxEB9stmgw1waYsh"; "n47WFRTYsNiwckVEP5rLPW3nE6XdoGZm1m"; "mrstLu5FHxaPqgh59vMzfZo2EAAKdDJHKM"; "miSGSuMTnXqHfptD9mPLqbAmqc1aQYdaSo" ] in
 
   let ips = Hashtbl.create 10 in
   let counter = ref 0 in
