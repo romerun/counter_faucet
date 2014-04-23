@@ -58,7 +58,7 @@ def try_to_send(destination,index):
             tx_hex = response['result']
 
             payload = {
-                "method": "transmit",
+                "method": "sign_tx",
                 "params": [tx_hex],
                 "jsonrpc": "2.0",
                 "id": 0,
@@ -66,10 +66,26 @@ def try_to_send(destination,index):
 
             response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
             response = response.json()
+
             if 'result' in response:
-                tx_id = response['result']
-                print("sent from %s to %s: response = %s\n" % (donation_addresses[index], destination, tx_id))
-                time.sleep(1)
+                signed_tx = response['result']
+
+                payload = {
+                    "method": "broadcast_tx",
+                    "params": [signed_tx],
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                }
+
+                response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
+                response = response.json()
+
+                if 'result' in response:
+                    tx_id = response['result']
+                    print("sent from %s to %s: response = %s\n" % (donation_addresses[index], destination, tx_id))
+                    time.sleep(1)
+                else:
+                    try_to_send(destination,index+1)
             else:
                 try_to_send(destination,index+1)
         else:
