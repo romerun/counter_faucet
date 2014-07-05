@@ -47,19 +47,20 @@ def try_to_send(destination,index):
     else:
         payload = {
             "method": "create_send",
-            "params": [donation_addresses[index], destination, "XCP", giveaway_per_beggar],
+            "params": {'source': donation_addresses[index], 'destination': destination, 'asset': "XCP", 'quantity': giveaway_per_beggar},
             "jsonrpc": "2.0",
             "id": 0,
         }
 
         response = requests.post(counterparty_url, data=json.dumps(payload), headers=headers, auth=auth)
         response = response.json()
+
         if 'result' in response:
             tx_hex = response['result']
 
             payload = {
                 "method": "sign_tx",
-                "params": [tx_hex],
+                "params": {'unsigned_tx_hex': tx_hex},
                 "jsonrpc": "2.0",
                 "id": 0,
             }
@@ -72,7 +73,7 @@ def try_to_send(destination,index):
 
                 payload = {
                     "method": "broadcast_tx",
-                    "params": [signed_tx],
+                    "params": {'signed_tx_hex': signed_tx},
                     "jsonrpc": "2.0",
                     "id": 0,
                 }
