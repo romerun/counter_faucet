@@ -162,11 +162,11 @@ $(TEST_PREFIX)$(LIBDIR)/$(PROJECT_NAME).cma: $(call objs,$(ELIOM_SERVER_DIR),cmo
           $(call depsort,$(ELIOM_SERVER_DIR),cmo,-server,$(SERVER_INC),$(SERVER_FILES))
 
 $(TEST_PREFIX)$(LIBDIR)/$(PROJECT_NAME).cmxa: $(call objs,$(ELIOM_SERVER_DIR),cmx,$(SERVER_FILES)) | $(TEST_PREFIX)$(LIBDIR)
-	${ELIOMOPT} -a -o $@ $(GENERATE_DEBUG) \
+	${ELIOMOPT} -a -type_conv -o $@ $(GENERATE_DEBUG) \
           $(call depsort,$(ELIOM_SERVER_DIR),cmx,-server,$(SERVER_INC),$(SERVER_FILES))
 
 %.cmxs: %.cmxa
-	$(ELIOMOPT) -shared -linkall -o $@ $(GENERATE_DEBUG) $<
+	$(ELIOMOPT) -type_conv -shared -linkall -o $@ $(GENERATE_DEBUG) $<
 
 ${ELIOM_SERVER_DIR}/%.cmi: %.mli
 	${ELIOMC} -c -type_conv ${SERVER_INC} $(GENERATE_DEBUG) $<
@@ -180,9 +180,9 @@ ${ELIOM_SERVER_DIR}/%.cmo: %.eliom
 	${ELIOMC} -c -type_conv ${SERVER_INC} $(GENERATE_DEBUG) $<
 
 ${ELIOM_SERVER_DIR}/%.cmx: %.ml
-	${ELIOMOPT} -c ${SERVER_INC} $(GENERATE_DEBUG) $<
+	${ELIOMOPT} -c -type_conv ${SERVER_INC} $(GENERATE_DEBUG) $<
 ${ELIOM_SERVER_DIR}/%.cmx: %.eliom
-	${ELIOMOPT} -c ${SERVER_INC} $(GENERATE_DEBUG) $<
+	${ELIOMOPT} -c -type_conv ${SERVER_INC} $(GENERATE_DEBUG) $<
 
 
 ##----------------------------------------------------------------------
