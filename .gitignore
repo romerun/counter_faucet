@@ -10,5 +10,4 @@ _*
 setup.ml
 myocamlbuild.ml
 local
-.depend
 META
